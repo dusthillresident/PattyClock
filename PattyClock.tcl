@@ -7,7 +7,7 @@
 package require Tk
 tk appname PattyClock
 
-# Create a text label at the top of the window. We will use this to display the date and time in text/digital form.
+# Create a text label at the bottom of the window. We will use this to display the date and time in text/digital form.
 pack [label .clock_text_string -text "Clock"] -fill x -side bottom
 # Create the canvas and make it fill the rest of the area of the window.
 pack [canvas .clock_face -background \#00007f] -fill both -expand 1
