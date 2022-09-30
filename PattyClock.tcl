@@ -7,10 +7,20 @@
 package require Tk
 tk appname PattyClock
 
+# Obtain the default foreground and background colours so that the colours of the clock match the system defined colour scheme.
+button .b
+set bg_col [lindex [lindex [.b configure] 3] end]
+set fg_col [lindex [lindex [.b configure] 15] end]
+destroy .b
+
+# Create the clock window icon picture.
+image create photo clock_icon -data {iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAABHNCSVQICAgIfAhkiAAAAKdJREFUOE+tk1sSgCAIRaVp/1s2H6AXJMmZ+lIeBy5kSj98tGFkx+fGe8aWnHNnEJE6M1jl3aZayfUa6FEArkEDhMQtwEqrHQrosk5752BrVneBHHVRCSytaQ872bbATpnJmKYdLMrBjQG8T6d3t24F1+t1JMN9lRMBEOqu+AsgXLGdiycFbSinwNdXsLGNYPvbV5B6O0r7LKKqraVn1roueC+RxGP/A2qMPB+WbRS5AAAAAElFTkSuQmCC}
+wm iconphoto . clock_icon
+
 # Create a text label at the bottom of the window. We will use this to display the date and time in text/digital form.
 pack [label .clock_text_string -text "Clock"] -fill x -side bottom
 # Create the canvas and make it fill the rest of the area of the window.
-pack [canvas .clock_face -background \#00007f] -fill both -expand 1
+pack [canvas .clock_face -background $bg_col] -fill both -expand 1
 
 # .....................
 # .. draw_clock_hand ..
@@ -20,9 +30,10 @@ pack [canvas .clock_face -background \#00007f] -fill both -expand 1
 #  'thickness' specifies the thickness of the line used to draw the clock hand, 
 #  'turn_amount' is a value between 0.0 and 1.0 specifying how much we're turning the clock hand, from around 1 o'clock to around 12 o'clock
 proc draw_clock_hand {length thickness turn_amount} {
+ global fg_col bg_col
  upvar 1 wh wh cx cx cy cy
  set angle [expr {$turn_amount * 2 * 3.1415926535897931  -  3.1415926535897931 * 0.5}]
- .clock_face create line $cx $cy [expr {$cx+cos($angle)*$wh*$length*0.5}] [expr {$cy+sin($angle)*$wh*$length*0.5}] -fill white -width $thickness
+ .clock_face create line $cx $cy [expr {$cx+cos($angle)*$wh*$length*0.5}] [expr {$cy+sin($angle)*$wh*$length*0.5}] -fill $fg_col -width $thickness
 }
 
 # ..................
@@ -30,6 +41,7 @@ proc draw_clock_hand {length thickness turn_amount} {
 # ..................
 # This procedure wipes the .clock_face canvas blank and then redraws the clock based on the current time.
 proc update_clock {} { 
+ global fg_col bg_col
  # Prepare some local variables
  set canv_w [winfo width .clock_face] ;# canv_w,canv_h = the width and height of the canvas
  set canv_h [winfo height .clock_face]
@@ -47,14 +59,14 @@ proc update_clock {} {
   .clock_face delete $itm
  }
  # Draw the outline of the clock
- .clock_face create oval [expr {$cx-$radius}] [expr {$cy-$radius}] [expr {$cx+$radius}] [expr {$cy+$radius}] -outline white -width 5
+ .clock_face create oval [expr {$cx-$radius}] [expr {$cy-$radius}] [expr {$cx+$radius}] [expr {$cy+$radius}] -outline $fg_col -width 5
  # Draw the visual aid markers around the edge of the clock
  for {set i 0} {$i < 12} {incr i} {
   set a [expr {3.1415926535897931 * 2 / 12 * $i}]
   set x [expr {$cx+$radius*0.95*sin($a)}]
   set y [expr {$cy+$radius*0.95*cos($a)}]
   set r [expr {$radius*0.03}]
-  .clock_face create oval [expr {$x-$r}] [expr {$y-$r}] [expr {$x+$r}] [expr {$y+$r}] -outline white -fill white
+  .clock_face create oval [expr {$x-$r}] [expr {$y-$r}] [expr {$x+$r}] [expr {$y+$r}] -outline $fg_col -fill $fg_col
  }
  # Draw the hours hand of the clock
  draw_clock_hand 0.5  5 $hournow
@@ -81,3 +93,5 @@ proc updater {} {
  after 1000 updater
 }
 updater
+
+wm geometry . 256x280
