@@ -8,14 +8,22 @@ package require Tk
 tk appname PattyClock
 
 # Obtain the default foreground and background colours so that the colours of the clock match the system defined colour scheme.
-button .b
-set bg_col [lindex [lindex [.b configure] 3] end]
-set fg_col [lindex [lindex [.b configure] 15] end]
-destroy .b
+# If that fails for any reason, fallback colours are used instead.
+if [catch {
+ button .b
+ set bg_col [lindex [lindex [.b configure] 3] end]
+ set fg_col [lindex [lindex [.b configure] 15] end]
+ destroy .b
+}] {
+ set bg_col darkblue
+ set fg_col white
+}
 
 # Create the clock window icon picture.
-image create photo clock_icon -data {iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAABHNCSVQICAgIfAhkiAAAAKdJREFUOE+tk1sSgCAIRaVp/1s2H6AXJMmZ+lIeBy5kSj98tGFkx+fGe8aWnHNnEJE6M1jl3aZayfUa6FEArkEDhMQtwEqrHQrosk5752BrVneBHHVRCSytaQ872bbATpnJmKYdLMrBjQG8T6d3t24F1+t1JMN9lRMBEOqu+AsgXLGdiycFbSinwNdXsLGNYPvbV5B6O0r7LKKqraVn1roueC+RxGP/A2qMPB+WbRS5AAAAAElFTkSuQmCC}
-wm iconphoto . clock_icon
+catch {
+ image create photo clock_icon -data {iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAABHNCSVQICAgIfAhkiAAAAKdJREFUOE+tk1sSgCAIRaVp/1s2H6AXJMmZ+lIeBy5kSj98tGFkx+fGe8aWnHNnEJE6M1jl3aZayfUa6FEArkEDhMQtwEqrHQrosk5752BrVneBHHVRCSytaQ872bbATpnJmKYdLMrBjQG8T6d3t24F1+t1JMN9lRMBEOqu+AsgXLGdiycFbSinwNdXsLGNYPvbV5B6O0r7LKKqraVn1roueC+RxGP/A2qMPB+WbRS5AAAAAElFTkSuQmCC}
+ wm iconphoto . clock_icon
+}
 
 # Create a text label at the bottom of the window. We will use this to display the date and time in text/digital form.
 pack [label .clock_text_string -text "Clock"] -fill x -side bottom
