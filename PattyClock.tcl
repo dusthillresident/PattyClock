@@ -108,4 +108,4 @@ proc updater {} {
 }
 updater
 
-wm geometry . 256x280
+wm geometry . 196x216
