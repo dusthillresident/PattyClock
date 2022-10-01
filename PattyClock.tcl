@@ -67,21 +67,27 @@ proc update_clock {} {
   .clock_face delete $itm
  }
  # Draw the outline of the clock
- .clock_face create oval [expr {$cx-$radius}] [expr {$cy-$radius}] [expr {$cx+$radius}] [expr {$cy+$radius}] -outline $fg_col -width 5
+ .clock_face create oval [expr {$cx-$radius}] [expr {$cy-$radius}] [expr {$cx+$radius}] [expr {$cy+$radius}] -outline $fg_col -width 2
  # Draw the visual aid markers around the edge of the clock
- for {set i 0} {$i < 12} {incr i} {
-  set a [expr {3.1415926535897931 * 2 / 12 * $i}]
-  set x [expr {$cx+$radius*0.95*sin($a)}]
-  set y [expr {$cy+$radius*0.95*cos($a)}]
-  set r [expr {$radius*0.03}]
-  .clock_face create oval [expr {$x-$r}] [expr {$y-$r}] [expr {$x+$r}] [expr {$y+$r}] -outline $fg_col -fill $fg_col
+ for {set i 1} {$i < 13} {incr i} {
+  set a [expr {3.1415926535897931 * 2 / 12 * -$i + 3.1415926535897931}]
+  if {$wh>100} {
+   set x [expr {$cx+($radius-12)*sin($a)}]
+   set y [expr {$cy+($radius-12)*cos($a)}]
+   .clock_face create text [expr {$x-0}] [expr {$y-0}] -text $i -justify center -fill $fg_col
+  } else {
+   set x [expr {$cx+($radius-7)*sin($a)}]
+   set y [expr {$cy+($radius-7)*cos($a)}]
+   set r [expr {$radius*0.03}]
+   .clock_face create oval [expr {$x-$r}] [expr {$y-$r}] [expr {$x+$r}] [expr {$y+$r}] -outline $fg_col -fill $fg_col
+  }
  }
  # Draw the hours hand of the clock
- draw_clock_hand 0.5  5 $hournow
+ draw_clock_hand 0.45  4 $hournow
  # and the minutes hand
- draw_clock_hand 0.76 5 $minutenow
+ draw_clock_hand 0.71 4 $minutenow
  # and finally the seconds hand
- draw_clock_hand 0.86 1 $secondnow
+ draw_clock_hand 0.81 1 $secondnow
  # Update the text string representation of the time
  .clock_text_string configure -text [clock format [clock seconds]]
 }
