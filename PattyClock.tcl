@@ -11,8 +11,14 @@ tk appname PattyClock
 # If that fails for any reason, fallback colours are used instead.
 if [catch {
  button .b
- set bg_col [lindex [lindex [.b configure] 3] end]
- set fg_col [lindex [lindex [.b configure] 15] end]
+ foreach l [.b configure] {
+  if [string match "-background" [lindex $l 0]] {
+   set bg_col [lindex $l end]
+  }
+  if [string match "-foreground" [lindex $l 0]] {
+   set fg_col [lindex $l end]
+  }
+ }
  destroy .b
 }] {
  set bg_col darkblue
@@ -39,9 +45,9 @@ pack [canvas .clock_face -background $bg_col] -fill both -expand 1
 #  'turn_amount' is a value between 0.0 and 1.0 specifying how much we're turning the clock hand, from around 1 o'clock to around 12 o'clock
 proc draw_clock_hand {length thickness turn_amount} {
  global fg_col bg_col
- upvar 1 wh wh cx cx cy cy
+ upvar 1 radius radius cx cx cy cy
  set angle [expr {$turn_amount * 2 * 3.1415926535897931  -  3.1415926535897931 * 0.5}]
- .clock_face create line $cx $cy [expr {$cx+cos($angle)*$wh*$length*0.5}] [expr {$cy+sin($angle)*$wh*$length*0.5}] -fill $fg_col -width $thickness
+ .clock_face create line $cx $cy [expr {$cx+cos($angle)*$radius*$length}] [expr {$cy+sin($angle)*$radius*$length}] -fill $fg_col -width $thickness
 }
 
 # ..................
@@ -82,12 +88,13 @@ proc update_clock {} {
    .clock_face create oval [expr {$x-$r}] [expr {$y-$r}] [expr {$x+$r}] [expr {$y+$r}] -outline $fg_col -fill $fg_col
   }
  }
+ set radius [expr {$radius-24+12*($wh<100)}]
  # Draw the hours hand of the clock
  draw_clock_hand 0.45  4 $hournow
  # and the minutes hand
- draw_clock_hand 0.71 4 $minutenow
+ draw_clock_hand 0.75 4 $minutenow
  # and finally the seconds hand
- draw_clock_hand 0.81 1 $secondnow
+ draw_clock_hand 1.0 1 $secondnow
  # Update the text string representation of the time
  .clock_text_string configure -text [clock format [clock seconds]]
 }
@@ -108,4 +115,4 @@ proc updater {} {
 }
 updater
 
-wm geometry . 196x216
+wm geometry . 226x246
